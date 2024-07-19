@@ -1,8 +1,21 @@
 import os
 import platformdirs
-from transformers import AutoModelForCausalLM, AutoProcessor, BitsAndBytesConfig
 from PIL import Image
 import requests
+
+
+from peft import PeftConfig, PeftModel
+import torch
+from peft import LoraConfig, prepare_model_for_kbit_training, PeftModel
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig,
+    TrainingArguments,
+    set_seed,
+    pipeline,
+    AutoProcessor
+)
 
 from .base import EngineLM, CachedEngine
 from PIL import Image
@@ -30,7 +43,29 @@ class originalChatphi3(EngineLM, CachedEngine):
         
         super().__init__(cache_path=cache_path)
 
-        self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda", trust_remote_code=True, torch_dtype="auto", _attn_implementation='flash_attention_2') # use _attn_implementation='eager' to disable flash attention
+
+
+
+
+
+        bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype="bfloat16",
+        bnb_4bit_use_double_quant=True,
+        )
+
+        self.model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        torch_dtype='auto',
+        trust_remote_code=True,
+        quantization_config=bnb_config,
+        device_map='auto',
+        attn_implementation='flash_attention_2',token=HF_TOKEN
+
+        ) 
+
+        # self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda", trust_remote_code=True, torch_dtype="auto", _attn_implementation='flash_attention_2') # use _attn_implementation='eager' to disable flash attention
 
         self.processor = AutoProcessor.from_pretrained(processor_name, trust_remote_code=True)
             
