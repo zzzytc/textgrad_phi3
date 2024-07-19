@@ -41,7 +41,8 @@ def get_engine(engine_name: str, **kwargs) -> EngineLM:
         return AzureChatOpenAI(model_string=engine_name, **kwargs)
     elif (("gpt-4" in engine_name) or ("gpt-3.5" in engine_name)):
         from .openai import ChatOpenAI
-        return ChatOpenAI(model_string=engine_name, is_multimodal=_check_if_multimodal(engine_name), **kwargs)
+        # return ChatOpenAI(model_string=engine_name, is_multimodal=_check_if_multimodal(engine_name), **kwargs)
+        return ChatOpenAI(model_string=engine_name, **kwargs)
     elif "claude" in engine_name:
         from .anthropic import ChatAnthropic
         return ChatAnthropic(model_string=engine_name, is_multimodal=_check_if_multimodal(engine_name), **kwargs)
