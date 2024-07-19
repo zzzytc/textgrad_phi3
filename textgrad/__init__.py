@@ -19,7 +19,7 @@ logger.addHandler(sh)
 
 from .variable import Variable
 from .loss import TextLoss
-from .model import BlackboxLLM
+from .model import BlackboxLLM, MultimodalBlackboxLLM
 from .engine import EngineLM, get_engine
 from .optimizer import TextualGradientDescent, TGD
 from .config import set_backward_engine, SingletonBackwardEngine
