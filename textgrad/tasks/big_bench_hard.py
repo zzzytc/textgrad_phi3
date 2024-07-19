@@ -6,6 +6,8 @@ import platformdirs
 import textgrad as tg
 from .base import Dataset
 
+import openai
+import os
 # The below metric is taken from DSPy for consistenc
 # and modified to work with TG-graphs
 
@@ -26,6 +28,31 @@ def parse_integer_answer(answer: str, only_first_line: bool=False):
     
     return answer
 
+def eval_semantic_similarity(prediction: tg.Variable, ground_truth_answer: tg.Variable) -> int:
+    """
+    Evaluate if two texts have the same semantic meaning using GPT-3.5 Turbo.
+
+    :param x: The first text.
+    :param y: The second text.
+    :return: 1 if the texts have the same semantic meaning, 0 otherwise.
+    """
+    prompt = f"Do the following two object have the same meaning?\n\nSentence 1: {prediction.value}\nSentence 2: {ground_truth_answer.value}\n\nAnswer with 'Yes' or 'No'."
+    
+    response = openai.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+    # print(response)
+    answer = response.choices[0].message.content.strip().lower()
+    # print(answer)
+    if "yes" in answer:
+        return True
+    else:
+        return False
+    
 def string_based_equality_fn(prediction: tg.Variable, ground_truth_answer: tg.Variable):
     return int(parse_integer_answer(str(prediction.value)) == int(parse_integer_answer(str(ground_truth_answer.value))))
 

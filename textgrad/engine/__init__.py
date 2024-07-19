@@ -68,4 +68,5 @@ def get_engine(engine_name: str, **kwargs) -> EngineLM:
         engine_name = engine_name.replace("vllm-", "")
         return ChatVLLM(model_string=engine_name, **kwargs)
     else:
-        raise ValueError(f"Engine {engine_name} not supported")
+        from .originalphi3 import originalChatphi3
+        return originalChatphi3(**kwargs)
