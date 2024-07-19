@@ -2,7 +2,7 @@ from textgrad import logger
 from textgrad.defaults import (SYSTEM_PROMPT_DEFAULT_ROLE, 
                                VARIABLE_OUTPUT_DEFAULT_ROLE)
 from textgrad.variable import Variable
-from textgrad.engine import EngineLM, validate_multimodal_engine
+from textgrad.engine import EngineLM#, validate_multimodal_engine
 from typing import List
 from .llm_backward_prompts import (
     EVALUATE_VARIABLE_INSTRUCTION,
@@ -14,7 +14,7 @@ from .llm_backward_prompts import (
 )
 from .multimodal_backward_prompts import MULTIMODAL_CONVERSATION_TEMPLATE
 from typing import Union
-from textgrad.config import validate_engine_or_get_default
+# from textgrad.config import validate_engine_or_get_default
 from .function import Function, BackwardContext
 
 
@@ -31,8 +31,9 @@ class MultimodalLLMCall(Function):
                  engine: Union[str, EngineLM], 
                  system_prompt: Variable = None):
         super().__init__()
-        self.engine = validate_engine_or_get_default(engine)
-        validate_multimodal_engine(self.engine)
+        # self.engine = validate_engine_or_get_default(engine)
+        # validate_multimodal_engine(self.engine)
+        self.engine = engine
 
         self.system_prompt = system_prompt
         if self.system_prompt and self.system_prompt.get_role_description() is None:
@@ -87,7 +88,7 @@ class MultimodalLLMCall(Function):
 
     
     def backward(self, response: Variable, input_content: List[Union[str, bytes]], system_prompt: str, backward_engine: EngineLM):
-        validate_multimodal_engine(backward_engine)
+        # validate_multimodal_engine(backward_engine)
 
         children_variables = response.predecessors
         if response.get_gradient_text() == "":
@@ -200,8 +201,10 @@ class OrderedFieldsMultimodalLLMCall(MultimodalLLMCall):
                  fields: List[str],
                  system_prompt: Variable = None):
 
-        self.engine = validate_engine_or_get_default(engine)
-        validate_multimodal_engine(self.engine)
+        # self.engine = validate_engine_or_get_default(engine)
+        # validate_multimodal_engine(self.engine)
+
+        self.engine = engine
 
         self.system_prompt = system_prompt
         if self.system_prompt and self.system_prompt.get_role_description() is None:
