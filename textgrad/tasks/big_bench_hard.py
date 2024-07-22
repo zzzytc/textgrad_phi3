@@ -49,9 +49,9 @@ def eval_semantic_similarity(prediction: tg.Variable, ground_truth_answer: tg.Va
     answer = response.choices[0].message.content.strip().lower()
     # print(answer)
     if "yes" in answer:
-        return True
+        return 1
     else:
-        return False
+        return 0
     
 def string_based_equality_fn(prediction: tg.Variable, ground_truth_answer: tg.Variable):
     return int(parse_integer_answer(str(prediction.value)) == int(parse_integer_answer(str(ground_truth_answer.value))))

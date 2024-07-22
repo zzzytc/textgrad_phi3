@@ -65,21 +65,30 @@ class originalChatphi3(EngineLM, CachedEngine):
 
         ) 
 
-        # self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map="cuda", trust_remote_code=True, torch_dtype="auto", _attn_implementation='flash_attention_2') # use _attn_implementation='eager' to disable flash attention
-
         self.processor = AutoProcessor.from_pretrained(processor_name, trust_remote_code=True)
             
     def generate(self, question, image_path=None, system_prompt = None, eos_token_id=None ):
         
         eos_token_id = self.processor.tokenizer.eos_token_id
 
+        image_path = None
+        text_content = None
+
+        # Process the list
+        for item in question:
+            if item.startswith('image:'):
+                path = item[len('image: '):]  # Extract the path after 'image: '
+            elif item.startswith('text:'):
+                text_content = item[len('text: '):]  # Extract the text after 'text: '
         messages = [ 
             {"role": "user", "content": f"<|image_1|>\n{system_prompt}"}, 
-            {"role": "user", "content": f"{question}"} ]
-        if image_path != None:    
-            image = Image.open(requests.get(image_path, stream=True).raw)
+            {"role": "user", "content": f"{text_content}"} ]
+        if path != None:    
+            # image = Image.open(requests.get(image_path.value, stream=True).raw)
+            image = Image.open(path)
+            image.show()
         prompt = self.processor.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-
+        print(f"##############path{path}")
         if prompt.endswith("<|endoftext|>"):
             prompt = prompt.rstrip("<|endoftext|>")
         
